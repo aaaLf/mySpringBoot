@@ -1,0 +1,94 @@
+<!DOCTYPE html> 
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>TOPO</title>
+		<style type="text/css">
+		*{
+			margin: 0;
+			padding: 0;
+			border: 0;
+			font-family: Arial, Helvetica, sans-serif;
+			font-size: 12px;
+			color: #333333;
+			line-height: 24px;
+		}
+		
+		div{
+			font-size:14px;
+			border-style: solid; 
+			border-color: #000000 #000000 #000000 #000000; 
+			border-width: 1px; 
+			overflow:hidden;
+		}
+		
+		body{
+			height: 500px;
+		}
+		.container{
+			width:98%;
+			height:100%;
+			margin-left:1%;
+			margin-right:1%;
+			display:table;
+		}
+		
+		.toolBox{
+			width:20%;
+			height:100%;
+			display:table-cell;
+		}
+		
+		.canvasBox{
+			width:auto;
+			height:100%;
+			display:table-cell;
+		}
+		
+		.attributeBox{
+			width:20%;
+			height:100%;
+			display:table-cell;
+		}
+		</style>
+	</head>
+	
+	<body>
+		<div class="container">
+			<div class="toolBox">
+				<div>
+					
+				</div>
+			</div>
+			<div class="canvasBox"><canvas id="canvas"></canvas></div>
+			<div class="attributeBox"></div>
+		</div>
+	</body>
+	
+	<script type="text/javascript" src="/js/jquery.js"></script>
+	<script type="text/javascript" src="/js/jtopo-min.js"></script>
+	<script type="text/javascript" src="/js/toolbar.js"></script>
+	<script type="text/javascript">
+		var canvas = document.getElementById('canvas'); 
+		canvas.width = canvas.parentElement.offsetWidth;
+		canvas.height = canvas.parentElement.offsetHeight;
+		debugger
+		var stage = new JTopo.Stage(canvas);
+		var scene = new JTopo.Scene(stage);
+		
+		var node = new JTopo.Node("Hello");
+		node.setImage("/img/server_monitor.png")
+		node.setLocation(300,200);               
+		scene.add(node);
+		
+		var node1 = new JTopo.Node("Hello1");
+		node1.setImage("/img/server_monitor.png")
+		node1.setLocation(400,200);               
+		scene.add(node1);
+		
+		var link = new JTopo.Link(node, node1);
+		link.strokeColor = "0,0,0"
+	    scene.add(link);
+	    
+	</script>
+</html>
