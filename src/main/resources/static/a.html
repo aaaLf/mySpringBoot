@@ -1,87 +1,125 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html>
 	<head>
-		<meta charset="UTF-8">
-		<title>TOPO</title>
-		<style type="text/css">
-		*{
-			margin: 0;
-			padding: 0;
-			border: 0;
-			font-family: Arial, Helvetica, sans-serif;
-			font-size: 12px;
-			color: #333333;
-			line-height: 24px;
-		}
-		
-		div{
-			font-size:14px;
-			border-style: solid; 
-			border-color: #000000 #000000 #000000 #000000; 
-			border-width: 1px; 
-			overflow:hidden;
-		}
-		
-		body{
-			height: 500px;
-		}
-		.container{
-			width:98%;
-			height:100%;
-			margin-left:1%;
-			margin-right:1%;
-			display:table;
-		}
-		
-		.toolBox{
-			width:20%;
-			height:100%;
-			display:table-cell;
-		}
-		
-		.canvasBox{
-			width:auto;
-			height:100%;
-			display:table-cell;
-		}
-		
-		.attributeBox{
-			width:20%;
-			height:100%;
-			display:table-cell;
-		}
+	    <meta charset="utf-8">
+	    <title>vue example</title>
+	    <style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+				border: 0;
+				font-family: Arial, Helvetica, sans-serif;
+				font-size: 12px;
+				color: #333333;
+				line-height: 24px;
+			}
+			
+			div{
+				font-size:14px;
+				border-style: solid; 
+				border-color: #000000 #000000 #000000 #000000; 
+				border-width: 1px; 
+				overflow:hidden;
+			}
+			
+			body{
+				height: 500px;
+			}
+			.container{
+				width:98%;
+				height:100%;
+				margin-left:1%;
+				margin-right:1%;
+				display:table;
+			}
+			
+			.toolBox{
+				width:20%;
+				height:100%;
+				display:table-cell;
+			}
+			
+			.canvasBox{
+				width:auto;
+				height:100%;
+				display:table-cell;
+			}
+			
+			.attributeBox{
+				width:20%;
+				height:100%;
+				display:table-cell;
+			}
+			
+			ul{
+				width: 100%;
+				float: left;
+			}
+			
+			li{
+				width: 20%;
+				height:20%;
+				float: left;
+			}
+			
+			li img{
+				width: 20%;
+				height:20%;
+			}
 		</style>
 	</head>
 	
 	<body>
 		<div class="container">
-			<div class="toolBox"></div>
-			<div class="canvasBox"><canvas width="100%" height="100%" id="canvas" style="background-color: rgb(238, 238, 238); border: 1px solid rgb(68, 68, 68); cursor: default;"></canvas></div>
+			<div class="toolBox">
+				<ul>
+					<li v-for="item in 10" @dragstart="dragstart" draggable="true">
+						<img alt="" src="/img/server_monitor.png"> {{$index+1}}
+					</li>
+				</ul>
+			</div>
+			<div class="canvasBox"><canvas id="canvas" @dragover='dragover' @drop="drop"></canvas></div>
 			<div class="attributeBox"></div>
 		</div>
 	</body>
 	
+	<script type="text/javascript" src="/js/vue.js"></script>
 	<script type="text/javascript" src="/js/jquery.js"></script>
 	<script type="text/javascript" src="/js/jtopo-min.js"></script>
 	<script type="text/javascript" src="/js/toolbar.js"></script>
 	<script type="text/javascript">
-		var canvas = document.getElementById('canvas'); 
-		var stage = new JTopo.Stage(canvas);
-		var scene = new JTopo.Scene(stage);
-		
-		var node = new JTopo.Node("Hello");
-		node.setImage("/img/server_monitor.png")
-		node.setLocation(300,200);               
-		scene.add(node);
-		
-		var node1 = new JTopo.Node("Hello1");
-		node1.setImage("/img/server_monitor.png")
-		node1.setLocation(400,200);               
-		scene.add(node1);
-		
-		var link = new JTopo.Link(node, node1);
-		link.strokeColor = "0,0,0"
-	    scene.add(link);
-	    
+		new Vue({
+			el: '.container',
+			data: {
+				scene:null,
+				node:[],
+				line:[]
+			},
+			 methods: {
+				 dragstart: function(event){
+					 event.dataTransfer.setData("src",event.target.src);
+				 },
+				 dragover: function(event){
+					 event.preventDefault();
+				 },
+				 drop: function(event){
+					event.preventDefault();
+					var data=event.dataTransfer.getData("src");
+					var node = new JTopo.Node("Hello");
+					node.setImage(data)
+					node.setLocation(event.offsetX,event.offsetY); 
+					node.dragable = false
+					this.scene.add(node);
+					 
+				 },
+			 },
+			 ready: function(){
+					var canvas = document.getElementById('canvas'); 
+					canvas.width = canvas.parentElement.offsetWidth;
+					canvas.height = canvas.parentElement.offsetHeight;
+					var stage = new JTopo.Stage(canvas);
+					this.scene = new JTopo.Scene(stage);
+			 }
+		})
 	</script>
 </html>
