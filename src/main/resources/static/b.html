@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap 101 Template</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
+    
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style type="text/css">
+    	.container{
+    		overflow: hidden;
+    	}
+    	.editor_container{
+    		position: absolute;
+		    box-sizing: border-box;
+		    width: 100%;
+		    overflow: hidden;
+		    top: 40px;
+		    left:0px;
+		    bottom:20px;
+    	}
+    	.toolbar{
+    		-webkit-user-select: none;
+		    user-select: none;
+    		position: absolute;
+		    box-sizing: border-box;
+		    top: 0px;
+		    left: 0px;
+		    width: 100%;
+		    height: 40px;
+		    padding: 5px;
+		    text-align: center;
+		    box-shadow: 0px 0px 5px #888;
+    	}
+    	.footer{
+    		position: absolute;
+		    box-sizing: border-box;
+		    left: 0px;
+		    bottom:0px;
+		    width: 100%;
+		    height: 20px;
+		    border-top: solid 1px #CCC;
+		    margin-top: 0px;
+    	}
+    	.buttonBar{
+    		position: absolute;
+		    box-sizing: border-box;
+		    top: 0px;
+		    left: 0px;
+		    bottom:0px;
+		    width:18%;
+		    min-width:200px; 
+		    max-width:400px;
+		    box-shadow: 0px 5px 5px #888;
+		    background-color: #FFF;
+		    overflow-y: auto;
+		    
+    	}
+     	.editor{
+    		position: absolute;
+		    box-sizing: border-box;
+		    top: 0px;
+		    right:0px;
+		    bottom:0px;
+		    width:18%;
+		    min-width:200px; 
+		    max-width:400px;
+		    box-shadow: 0px 5px 5px #888;
+		    padding: 10px;
+		    overflow-y: auto;
+		    border-top: solid 1px #CCC;
+		    background-color: #FFF;
+    	}
+    	.canvas{
+    		position: absolute;
+		    box-sizing: border-box;
+		    top: 0px;
+		    left: 18%;
+		    bottom:0px;
+		    width:82%;
+		    opacity:0.5;
+		    z-index:-1;
+		    overflow: hidden;
+    	}
+    	
+    	.group_title{
+    		padding: 4px 0px;
+		    background-color: #FFF;
+		    text-align: center;
+		    border-top: solid 1px #ccc;
+		    cursor: pointer;
+		    font-weight: 550;
+		    font-size: 1.1em;
+		    color: #555;
+		    position: relative;
+		    -webkit-user-select: none;
+		    user-select: none;
+		    font-family: "Microsoft YaHei";
+    	}
+    	.title_icon{
+    		position: absolute;
+		    right: 5px;
+		    top: 5px
+    	}
+    	.title_icon:hover{
+    	}
+    	.group_models{
+    		padding-bottom: 10px;
+		    min-height: 70px;
+		    background-color: #FFF;
+		    overflow-y: auto;
+		    text-align: center;
+		    line-height: 0px;
+		    margin: 0px;
+		    -webkit-user-select: none;
+		    user-select: none;
+    	}
+    	.model:hover{
+    		background-color: #D3D3D3;
+    	}
+    	
+    	.model{
+    		display: inline-block;
+	    	vertical-align: middle;
+	    	height: 40px;
+    	}
+    	.model img{
+    		margin-top:5px;
+    		width: 30px;
+    		height: 30px;
+    	}
+    	
+    	.group_closed > .group_models {
+		    display: none;
+		}
+		.group_closed > .group_title{
+			background-color: #ebebeb;
+		}
+    </style>
+  </head>
+  <body>
+	<div class="container">
+		<div class="toolbar">
+			<div class="btn-group" role="group" aria-label="...">
+				<button type="button" class="btn btn-default btn-sm active" title="默认">
+					<i class="fab fa-telegram-plane"></i>
+				</button>
+				<button type="button" class="btn btn-default btn-sm" title="框选">
+					<i class="fas fa-expand"></i>
+				</button>
+				<button type="button" class="btn btn-default btn-sm"  title="浏览">
+					<i class="far fa-square"></i>
+				</button>
+			</div>
+			
+			<div class="btn-group" role="group" aria-label="...">
+				<button type="button" class="btn btn-default btn-sm active" title="居中显示">
+					<i class="fas fa-compress"></i>
+				</button>
+				<button type="button" class="btn btn-default btn-sm" title="全屏显示">
+					<i class="fas fa-arrows-alt"></i>
+				</button>
+				<button type="button" class="btn btn-default btn-sm" title="放大">
+					<i class="fas fa-search-plus"></i>
+				</button>
+				<button type="button" class="btn btn-default btn-sm" title="缩小">
+					<i class="fas fa-search-minus"></i>
+				</button>
+			</div>
+			
+			<div class="btn-group" role="group" aria-label="...">
+				<button type="button" class="btn btn-default btn-sm" title="无箭头连线">
+					<i class="fas fa-code-branch"></i>
+				</button>
+				<button type="button" class="btn btn-default btn-sm" title="带箭头直线">
+					<i class="fas fa-long-arrow-alt-right"></i>
+				</button>
+				<button type="button" class="btn btn-default btn-sm" title="带箭头曲线">
+					<i class="fas fa-level-up-alt"></i>
+				</button>
+			</div>
+			
+			<div class="btn-group" role="group" aria-label="...">
+				<button type="button" class="btn btn-default btn-sm" title="导出json配置">
+					<i class="fas fa-download"></i>
+				</button>
+				<button type="button" class="btn btn-default btn-sm" title="导入json配置">
+					<i class="fas fa-upload"></i>
+				</button>
+			</div>
+		</div>
+		<div class="editor_container">
+			<div class="buttonBar">
+				
+				<div class="group">
+					<div class="group_title">
+						<span>扁平化图标</span>
+						<span class="title_icon"><i class="fas fa-chevron-down"></i></span>
+					</div>
+					
+					<div class="row group_models">
+						<div class="col-md-3 model">
+							<img alt="服务器管理" alt="服务器管理" src="/img/服务器管理.png">
+						</div>
+						<div class="col-md-3 model">
+							<img alt="服务器" alt="服务器" src="/img/服务器.png">
+						</div>
+						<div class="col-md-3 model">
+							<img alt="交换机组" alt="交换机组" src="/img/交换机组.png">
+						</div>
+						<div class="col-md-3 model">
+							<img alt="交换机" alt="交换机" src="/img/交换机.png">
+						</div>
+						<div class="col-md-3 model">
+							<img alt="路由器" title="路由器" src="/img/路由器.png">
+						</div>
+					</div>
+					<div style="clear: both;"></div>
+				</div>
+				
+				<div class="group">
+					<div class="group_title">
+						<span>二维图标</span>
+						<span class="title_icon"><i class="fas fa-chevron-down"></i></span>
+					</div>
+					
+					<div class="row group_models">
+						<div class="col-md-3 model">
+							<img alt="拓扑图_防火墙" title="拓扑图_防火墙" src="/img/2/拓扑图_防火墙.png">
+						</div>
+						<div class="col-md-3 model">
+							<img alt="拓扑图_服务器组" title="拓扑图_防火墙" src="/img/2/拓扑图_防火墙.png">
+						</div>
+						<div class="col-md-3 model">
+							<img alt="交换机组"title="拓扑图_基站" src="/img/2/拓扑图_基站.png">
+						</div>
+						<div class="col-md-3 model">
+							<img alt="交换机" title="拓扑图_角色" src="/img/2/拓扑图_角色.png">
+						</div>
+						<div class="col-md-3 model">
+							<img alt="路由器组" title="拓扑图_路由器" src="/img/2/拓扑图_路由器.png">
+						</div>
+						<div class="col-md-3 model">
+							<img alt="路由器组" title="拓扑图_应用服务器" src="/img/2/拓扑图_应用服务器.png">
+						</div>
+						<div class="col-md-3 model">
+							<img alt="路由器组" title="拓扑图_云" src="/img/2/拓扑图_云.png">
+						</div>
+					</div>
+					<div style="clear: both;"></div>
+				</div>
+				
+				<div class="group group_closed">
+					<div class="group_title">
+						<span>三维图标</span>
+						<span class="title_icon"><i class="fas fa-chevron-right"></i></span>
+					</div>
+					
+					<div class="row group_models">
+						<div class="col-md-3 model">
+							<img alt="服务器管理" alt="服务器管理" src="/img/服务器管理.png">
+						</div>
+						<div class="col-md-3 model">
+							<img alt="服务器" alt="服务器" src="/img/服务器.png">
+						</div>
+						<div class="col-md-3 model">
+							<img alt="交换机组" alt="交换机组" src="/img/交换机组.png">
+						</div>
+						<div class="col-md-3 model">
+							<img alt="交换机" alt="交换机" src="/img/交换机.png">
+						</div>
+						<div class="col-md-3 model">
+							<img alt="路由器" title="路由器" src="/img/路由器.png">
+						</div>
+					</div>
+					<div style="clear: both;"></div>
+				</div>
+			</div>
+			<div class="canvas"></div>
+			<div class="editor"></div>
+		</div>
+		<div class="footer"></div>
+	</div>
+  </body>
+  <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</html>

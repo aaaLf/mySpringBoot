@@ -5,7 +5,6 @@
 	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 	    <meta name="viewport" content="width=device-width, initial-scale=1">
 	    <title>vue example</title>
-	     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 	    <style type="text/css">
 			*{
 				margin: 0;
@@ -50,6 +49,8 @@
 				height:100%;
 				padding:5px;
 				display:table-cell;
+				position: absolute;
+				right: 0;
 			}
 			
 			.tool{
@@ -118,7 +119,7 @@
 					
 					<span style="float: left;width:50px;height: 30px;margin-left: 5px">
 						<input type="file" id="file" v-model="importFilePath" @change="fileImport($event)" accept=".json" style="filter:alpha(opacity=0);opacity:0;width: 0;height: 0;"/>
-						<button style="width: 100%;height: 20px;margin-top: 5px" @click="saveTopo">导入</button>
+						<button style="width: 100%;height: 20px;margin-top: 5px">导入</button>
 					</span>
 				</div>
 				<div class="canvas">
@@ -163,10 +164,10 @@
 	</body>
 	
 	<script type="text/javascript" src="/js/vue.js"></script>
-	<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+	<script type="text/javascript" src="/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/js/jquery_plus.js"></script>
 	<script type="text/javascript" src="/js/jtopo-min.js"></script>
 	<script type="text/javascript" src="/js/toolbar.js"></script>
-    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 		var a = new Vue({
 			el: '.container',
@@ -302,7 +303,6 @@
 										endNode = e;
 									}
 								})
-								debugger
 			        			var l = new JTopo.Link(beginNode, endNode);
 		                        l.arrowsRadius = 15;
 		    					l.lineWidth = 3;
@@ -330,12 +330,8 @@
 			 created: function(){
 					var canvas = this.$options.el.getElementsByTagName("canvas")[0]; 
 					var canvasBox = this.$options.el.getElementsByClassName("canvas")[0]; 
-					canvas.width = canvas.parentElement.offsetWidth;
-					canvas.height = canvas.parentElement.offsetHeight;
-					canvasBox.onresize = function(){
-						canvas.width = canvas.parentElement.offsetWidth;
-						canvas.height = canvas.parentElement.offsetHeight;
-					}
+					canvas.width = canvasBox.offsetWidth;
+					canvas.height = canvasBox.offsetHeight;
 					
 					this.stage = new JTopo.Stage(canvas);
 					this.scene = new JTopo.Scene(this.stage);
