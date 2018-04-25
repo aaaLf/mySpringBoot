@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 	<head>
-	    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta charset="utf-8">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
 	    <title>vue example</title>
+	     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 	    <style type="text/css">
 			*{
 				margin: 0;
@@ -45,17 +48,20 @@
 			.attributeBox{
 				width:20%;
 				height:100%;
+				padding:5px;
 				display:table-cell;
 			}
 			
 			.tool{
 				width: 100%;
 				height: 20%;
+				float: left;
 			}
 			
 			.canvas{
 				width: 100%;
 				height: 80%;
+				float: left;
 			}
 			
 			ul{
@@ -81,42 +87,94 @@
 			<div class="modelBox">
 				<ul>
 					<li v-for="item in 10">
-						<img alt="" @dragstart="dragstart" draggable="true" src="/img/server_monitor.png"> ������
+						<img alt="" @dragstart="dragstart" draggable="true" src="/img/server_monitor.png"> 服务器
 					</li>
 				</ul>
 			</div>
 			<div class="canvasBox">
 				<div class="tool">
-					<span style="float: left;width:200px;height: 30px">
-						
-						<input type="radio" @change='operaChange' name="opera" value="drag" checked="checked">
-						 <label>��ק</label>
-						&nbsp;&nbsp;
-						<input type="radio" @change='operaChange' name="opera" value="line">
-						<label>����</label>
+					<span style="float: left;width:150px;height: 30px">
+						<input type="checkbox" @change='islineChange' v-model="isline">
+						<label>连线</label>
+					</span>
+					<span style="float: left;width:300px;height: 30px;margin-left: 20px">
+						<input type="radio"  name="opare" v-model="scene.mode" value="normal">
+						<label>normal</label>&nbsp;&nbsp;
+						<input type="radio"  name="opare" v-model="scene.mode" value="drag">
+						<label>drag</label>&nbsp;&nbsp;
+						<input type="radio"  name="opare" v-model="scene.mode" value="select">
+						<label>select</label>&nbsp;&nbsp;
+						<input type="radio"  name="opare" v-model="scene.mode" value="edit">
+						<label>edit</label>
+					</span>
+					
+					<span style="float: left;width:50px;height: 30px;">
+						<button style="width: 100%;height: 20px;margin-top: 5px" @click="deletNode">删除</button>
+					</span>
+					
+					<span style="float: left;width:50px;height: 30px;margin-left: 5px">
+						<button style="width: 100%;height: 20px;margin-top: 5px" @click="saveTopo">保存</button>
+					</span>
+					
+					<span style="float: left;width:50px;height: 30px;margin-left: 5px">
+						<input type="file" id="file" v-model="importFilePath" @change="fileImport($event)" accept=".json" style="filter:alpha(opacity=0);opacity:0;width: 0;height: 0;"/>
+						<button style="width: 100%;height: 20px;margin-top: 5px" @click="saveTopo">导入</button>
 					</span>
 				</div>
 				<div class="canvas">
-					<canvas  id="canvas" @dragover='dragover' @drop="drop"></canvas>
+					<canvas  @dragover='dragover' @drop="drop"></canvas>
 				</div>
 			</div>
-			<div class="attributeBox"></div>
+			<div class="attributeBox" v-if="scene.selectedElements[0]">
+				<div style="width: 100%;height: 100%;float: left;">
+					<h3>Element</h3>
+					<div style="width: 100%;float: left;height: 30px;">
+						<label style="float: left;">名称：</label>
+						<input style="width: 70%;height: 100%;float: left;border-bottom-width: 1px;border-color: #878787;border-style: solid;" v-model="scene.selectedElements[0].text">
+					</div>
+					
+					<div style="width: 100%;float: left;height: 30px;">
+						<label style="float: left;">字体颜色：</label>
+						<input style="width: 50%;height: 100%;float: left;border-bottom-width: 1px;border-color: #878787;border-style: solid;" v-model="scene.selectedElements[0].fontColor">
+					</div>
+					
+					<div style="width: 100%;float: left;height: 30px;">
+						<label style="float: left;">宽度：</label>
+						<input style="width: 70%;height: 100%;float: left;border-bottom-width: 1px;border-color: #878787;border-style: solid;" v-model="scene.selectedElements[0].width">
+					</div>
+					
+					<div style="width: 100%;float: left;height: 30px;">
+						<label style="float: left;">高度：</label>
+						<input style="width: 70%;height: 100%;float: left;border-bottom-width: 1px;border-color: #878787;border-style: solid;" v-model="scene.selectedElements[0].height">
+					</div>
+					
+					<div style="width: 100%;float: left;height: 30px;">
+						<label style="float: left;">x：</label>
+						<input style="width: 70%;height: 100%;float: left;border-bottom-width: 1px;border-color: #878787;border-style: solid;" v-model.number="scene.selectedElements[0].x">
+					</div>
+					
+					<div style="width: 100%;float: left;height: 30px;">
+						<label style="float: left;">y：</label>
+						<input style="width: 70%;height: 100%;float: left;border-bottom-width: 1px;border-color: #878787;border-style: solid;" v-model.number="scene.selectedElements[0].y">
+					</div>
+				</div>
+			</div>
 		</div>
 	</body>
 	
 	<script type="text/javascript" src="/js/vue.js"></script>
-	<script type="text/javascript" src="/js/jquery.js"></script>
+	<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
 	<script type="text/javascript" src="/js/jtopo-min.js"></script>
 	<script type="text/javascript" src="/js/toolbar.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
-		new Vue({
+		var a = new Vue({
 			el: '.container',
 			data: {
+				importFilePath:null,
 				stage:null,
 				scene:null,
-				opera:'drag',
-				node:[],
-				line:[],
+				isline:false
 			},
 			 methods: {
 				 dragstart: function(event){
@@ -128,37 +186,156 @@
 				 drop: function(event){
 					event.preventDefault();
 					var data=event.dataTransfer.getData("src");
-					var node = new JTopo.Node("Hello");
+					var node = new JTopo.Node("服务器");
 					node.setImage(data)
+					node.setSize(32,32);
+					node.id = this.uuid();
+					if(this.isline){
+						node.dragable = false
+					}
 					node.setLocation(event.offsetX,event.offsetY);
 					this.scene.add(node);
-					this.node.push(node);
-					 
 				 },
-				 operaChange:function(e){
-					var val = e.target.value;
-					switch(val){
-					case 'line':
-						this.opera = 'line';
-						for(var i=0;i<this.node.length;i++){
-							this.node[i].dragable = false
-						}
-						break;
-					case 'drag':
-						this.opera = 'drag';
-						for(var i=0;i<this.node.length;i++){
-							this.node[i].dragable = true
-						}
-						break;
-					default:
-						  ;
+				 islineChange:function(e){
+					var imgs = this.$el.getElementsByTagName("ul")[0].getElementsByTagName("img");
+					if(this.isline){
+						this.scene.findElements(function(e){
+							if(e instanceof JTopo.Node){
+								e.dragable = false
+							}
+						})
+					}else{
+						this.scene.findElements(function(e){
+							if(e instanceof JTopo.Node){
+								e.dragable = true
+							}
+						})
 					}
-				 }
+				 },
+				 deletNode:function(e){
+					 var nodes = this.scene.selectedElements;
+					 if(nodes){
+						for(var i=0;i< nodes.length;i++ ){
+							this.scene.remove(nodes[i])
+						} 
+					 }
+				 },
+				 saveTopo:function(e){
+					 var json ={
+							 links:[],
+							 nodes:{}
+					 };
+					 
+					 this.scene.findElements(function(e){
+							if(e instanceof JTopo.Node){
+								var id = e.id;
+								debugger
+								var node = {
+										image:e.image.src,
+										x:e.x,
+										y:e.y,
+										width:e.width,
+										height:e.height,
+										text:e.text,
+										fontColor:e.fontColor
+								}
+								json.nodes[id] = node;
+							}else if(e instanceof JTopo.Link){
+								var link = {
+										text:e.text,
+										fontColor:e.fontColor,
+										nodeA:e.nodeA.id,
+										nodeZ:e.nodeZ.id
+								}
+								json.links.push(link);
+							}
+						})
+					    // 创建隐藏的可下载链接
+					    var eleLink = document.createElement('a');
+					    eleLink.download = 'topo.json';
+					    eleLink.style.display = 'none';
+					    // 字符内容转变成blob地址
+					    var blob = new Blob([JSON.stringify(json)]);
+					    eleLink.href = URL.createObjectURL(blob);
+					    // 触发点击
+					    document.body.appendChild(eleLink);
+					    eleLink.click();
+					    // 然后移除
+					    document.body.removeChild(eleLink);
+				 },
+				 fileImport:function(e){
+			        var fileObj = e.target;  
+			  
+			        var windowURL = window.URL || window.webkitURL;  
+			        var dataURL;    
+			  
+			        if (fileObj && fileObj.files && fileObj.files[0]) {  
+			            dataURL = windowURL.createObjectURL(fileObj.files[0]); 
+			        } else {  
+			            dataURL = fileObj.value;
+			        } 
+			        
+			        var scene = this.scene;
+			        $.getJSON(dataURL,function(data){
+			        	if(data){
+			        		scene.clear();
+			        		for(var nodeid in data.nodes){
+			        			var nodeData = data.nodes[nodeid];
+								var node = new JTopo.Node(nodeData.text);
+								node.id=nodeid;
+								node.setImage(nodeData.image)
+								node.setSize(nodeData.width,nodeData.height);
+								node.setLocation(nodeData.x,nodeData.y);
+								node.fontColor = nodeData.fontColor
+								scene.add(node);
+			        		}
+
+			        		for(var i = 0;i<data.links.length;i++){
+			        			var linkData = data.links[i];
+			        			var beginNode = null;
+			        			var endNode = null;
+								scene.findElements(function(e){
+									if(e.id == linkData.nodeA){
+										beginNode = e;
+									}
+									if(e.id == linkData.nodeZ){
+										endNode = e;
+									}
+								})
+								debugger
+			        			var l = new JTopo.Link(beginNode, endNode);
+		                        l.arrowsRadius = 15;
+		    					l.lineWidth = 3;
+		    					l.text = linkData.text
+		    					l.fontColor = linkData.fontColor
+		                        scene.add(l);
+			        		}
+			        	}
+			        });
+				 },
+				 uuid:function () {
+					  var s = [];
+					  var hexDigits = "0123456789abcdef";
+					  for (var i = 0; i < 36; i++) {
+					    s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+					  }
+					  s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+					  s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+					  s[8] = s[13] = s[18] = s[23] = "-";
+					  
+					  var uuid = s.join("");
+					  return uuid;
+					}
 			 },
-			 ready: function(){
-					var canvas = document.getElementById('canvas'); 
+			 created: function(){
+					var canvas = this.$options.el.getElementsByTagName("canvas")[0]; 
+					var canvasBox = this.$options.el.getElementsByClassName("canvas")[0]; 
 					canvas.width = canvas.parentElement.offsetWidth;
 					canvas.height = canvas.parentElement.offsetHeight;
+					canvasBox.onresize = function(){
+						canvas.width = canvas.parentElement.offsetWidth;
+						canvas.height = canvas.parentElement.offsetHeight;
+					}
 					
 					this.stage = new JTopo.Stage(canvas);
 					this.scene = new JTopo.Scene(this.stage);
@@ -171,27 +348,52 @@
 					var to = new JTopo.Node("to");
 					to.setSize(1, 1);
 					var link = new JTopo.Link(from, to);
+					link.arrowsRadius = 15;
+					link.lineWidth = 3;
+					
+					scene.mouseup(function(e){
+						if(!data.isline){
+							return;
+						}
+						
+		                if(e.button == 2){
+		                    scene.remove(link);
+		                    return;
+		                }
+		                if(e.target != null && e.target instanceof JTopo.Node){
+		                    if(beginNode == null){
+		                        beginNode = e.target;
+		                        scene.add(link);
+		                        from.setLocation(beginNode.x  + (beginNode.width/2), beginNode.y + (beginNode.height/2));
+		                        to.setLocation(e.x, e.y);
+		                    }else if(beginNode !== e.target){
+		                        var endNode = e.target;
+		                        var l = new JTopo.Link(beginNode, endNode);
+		                        l.arrowsRadius = 15;
+		    					l.lineWidth = 3;
+		                        scene.add(l);
+		                        beginNode = null;
+		                        scene.remove(link);
+		                    }else{
+		                        beginNode = null;
+		                    }
+		                }else{
+		                    scene.remove(link);
+		                }
+		            });
 		            
 		            scene.mousedown(function(e){
-		            	if(data.opera == 'line' && e.target != null && e.target instanceof JTopo.Node){
-	                        beginNode = e.target;
-	                        scene.add(link);
-	                        from.setLocation(e.x, e.y);
-	                        to.setLocation(e.x, e.y);
-	                        debugger
-	                        e.preventDefault();
-		            	}
-		            	
-			            scene.mousemove(function(e){
-			            	if(data.opera == 'line' && beginNode != null){
-			            		to.setLocation(e.x, e.y);
-			            	}
-			            });
-			            
-			            scene.mouseup(function(e){
-
-			            });
+		                if(!data.isline || e.target == null || e.target === beginNode || e.target === link){
+		                    scene.remove(link);
+		                    beginNode = null;
+		                }
 		            });
+		            scene.mousemove(function(e){
+		            	if(data.isline){
+		            		to.setLocation(e.x, e.y);
+		            	}
+		            });
+		            
 			 }
 		})
 	</script>
