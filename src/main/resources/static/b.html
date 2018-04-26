@@ -104,14 +104,14 @@
 		    font-family: "Microsoft YaHei";
     	}
     	.title_icon{
+    		vertical-align: middle;
     		position: absolute;
 		    right: 5px;
-		    top: 5px
-    	}
-    	.title_icon:hover{
+		    top: 5px;
+		    border-radius:2px;
     	}
     	.group_models{
-    		padding-bottom: 10px;
+    		padding: 10px;
 		    min-height: 70px;
 		    background-color: #FFF;
 		    overflow-y: auto;
@@ -121,17 +121,19 @@
 		    -webkit-user-select: none;
 		    user-select: none;
     	}
-    	.model:hover{
-    		background-color: #D3D3D3;
-    	}
-    	
     	.model{
     		display: inline-block;
 	    	vertical-align: middle;
-	    	height: 40px;
+	    	padding: 5px;
+	    	border-radius:2px;
+    	}
+    	.model:hover{
+    		background-color: #e6e6e6;
+    		border-color: #adadad;
+    		-webkit-box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
+    		box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
     	}
     	.model img{
-    		margin-top:5px;
     		width: 30px;
     		height: 30px;
     	}
@@ -140,8 +142,19 @@
 		    display: none;
 		}
 		.group_closed > .group_title{
-			background-color: #ebebeb;
+			background: -webkit-linear-gradient(top,#f0f0f0 0,#e3e3e3 100%);
+			background: -moz-linear-gradient(top,#f0f0f0 0,#e3e3e3 100%);
+			background: -o-linear-gradient(top,#f0f0f0 0,#e3e3e3 100%);
+			background: linear-gradient(to bottom,#f0f0f0 0,#e3e3e3 100%);
+			filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#f0f0f0,endColorstr=#e3e3e3,GradientType=0);
 		}
+    	.group_title:hover{
+			background: -webkit-linear-gradient(top,#e3e3e3 0,#f0f0f0 100%);
+			background: -moz-linear-gradient(top,#e3e3e3 0,#f0f0f0 100%);
+			background: -o-linear-gradient(top,#e3e3e3 0,#f0f0f0 100%);
+			background: linear-gradient(to bottom,#e3e3e3,#f0f0f0 0,100%);
+			filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#e3e3e3,endColorstr=#f0f0f0,GradientType=0);
+    	}
     </style>
   </head>
   <body>
@@ -197,90 +210,23 @@
 		</div>
 		<div class="editor_container">
 			<div class="buttonBar">
-				
-				<div class="group">
-					<div class="group_title">
-						<span>扁平化图标</span>
-						<span class="title_icon"><i class="fas fa-chevron-down"></i></span>
+				<template v-for="(group,index) in buttonBarJsonData">
+					<div class="group" :class="title_icon_status[index] === 'open'?'':'group_closed'">
+						<div class="group_title" @click="title_icon_click(index)">
+							<span>{{group.groupName}}</span>
+							<span class="title_icon"><i :class="title_icon_status[index] === 'open'?'fa-chevron-down':'fa-chevron-right'" class="fas"></i></span>
+						</div>
+						
+						<div class="row group_models">
+							<template v-for="model in group.models">
+								<div class="col-md-3 model">
+									<img :alt="model.name" :title="model.name" :draggable="draggable" :src="model.img" :m_data="JSON.stringify(model.attributes)">
+								</div>
+							</template>
+						</div>
+						<div style="clear: both;"></div>
 					</div>
-					
-					<div class="row group_models">
-						<div class="col-md-3 model">
-							<img alt="服务器管理" alt="服务器管理" src="/img/服务器管理.png">
-						</div>
-						<div class="col-md-3 model">
-							<img alt="服务器" alt="服务器" src="/img/服务器.png">
-						</div>
-						<div class="col-md-3 model">
-							<img alt="交换机组" alt="交换机组" src="/img/交换机组.png">
-						</div>
-						<div class="col-md-3 model">
-							<img alt="交换机" alt="交换机" src="/img/交换机.png">
-						</div>
-						<div class="col-md-3 model">
-							<img alt="路由器" title="路由器" src="/img/路由器.png">
-						</div>
-					</div>
-					<div style="clear: both;"></div>
-				</div>
-				
-				<div class="group">
-					<div class="group_title">
-						<span>二维图标</span>
-						<span class="title_icon"><i class="fas fa-chevron-down"></i></span>
-					</div>
-					
-					<div class="row group_models">
-						<div class="col-md-3 model">
-							<img alt="拓扑图_防火墙" title="拓扑图_防火墙" src="/img/2/拓扑图_防火墙.png">
-						</div>
-						<div class="col-md-3 model">
-							<img alt="拓扑图_服务器组" title="拓扑图_防火墙" src="/img/2/拓扑图_防火墙.png">
-						</div>
-						<div class="col-md-3 model">
-							<img alt="交换机组"title="拓扑图_基站" src="/img/2/拓扑图_基站.png">
-						</div>
-						<div class="col-md-3 model">
-							<img alt="交换机" title="拓扑图_角色" src="/img/2/拓扑图_角色.png">
-						</div>
-						<div class="col-md-3 model">
-							<img alt="路由器组" title="拓扑图_路由器" src="/img/2/拓扑图_路由器.png">
-						</div>
-						<div class="col-md-3 model">
-							<img alt="路由器组" title="拓扑图_应用服务器" src="/img/2/拓扑图_应用服务器.png">
-						</div>
-						<div class="col-md-3 model">
-							<img alt="路由器组" title="拓扑图_云" src="/img/2/拓扑图_云.png">
-						</div>
-					</div>
-					<div style="clear: both;"></div>
-				</div>
-				
-				<div class="group group_closed">
-					<div class="group_title">
-						<span>三维图标</span>
-						<span class="title_icon"><i class="fas fa-chevron-right"></i></span>
-					</div>
-					
-					<div class="row group_models">
-						<div class="col-md-3 model">
-							<img alt="服务器管理" alt="服务器管理" src="/img/服务器管理.png">
-						</div>
-						<div class="col-md-3 model">
-							<img alt="服务器" alt="服务器" src="/img/服务器.png">
-						</div>
-						<div class="col-md-3 model">
-							<img alt="交换机组" alt="交换机组" src="/img/交换机组.png">
-						</div>
-						<div class="col-md-3 model">
-							<img alt="交换机" alt="交换机" src="/img/交换机.png">
-						</div>
-						<div class="col-md-3 model">
-							<img alt="路由器" title="路由器" src="/img/路由器.png">
-						</div>
-					</div>
-					<div style="clear: both;"></div>
-				</div>
+				</template>
 			</div>
 			<div class="canvas"></div>
 			<div class="editor"></div>
@@ -288,6 +234,63 @@
 		<div class="footer"></div>
 	</div>
   </body>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
   <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
   <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript"> 
+	
+	function TOPO(element){
+		if(typeof element === "string"){
+			this.element = $(element)[0];
+		}else if(element instanceof HTMLElement){
+			this.element = element;
+		}else if(element instanceof HTMLCollection){
+			this.element = element[0];
+		}else{
+			throw '参数类型有误，TOPO(element)参数类型： string，HTMLElement,HTMLCollection';
+		}
+		if(this.element == null) throw '参数有误,未获取到绑定对象';
+		var element = this.element;
+		
+		this.toolbar = new Vue({
+			el: '.toolbar',
+			data: {
+			},
+			methods: {
+			}
+		})
+		this.buttonBar = new Vue({
+			el: '.buttonBar',
+			data: {
+				title_icon_status:['open'],
+				buttonBarJsonData:[],
+				draggable:true
+			},
+			methods: {
+				title_icon_click: function(i){
+					Vue.set(this.title_icon_status,i, this.title_icon_status[i] === 'open'?'close':'open');
+				}
+			}
+		})
+		this.editor;
+		this.canvas;
+	}
+	
+	TOPO.prototype.loadModelJsonData = function(jsonData){
+		var json;
+        if (typeof jsonData === 'string') {
+            try {
+            	json = JSON.parse(str);
+            } catch(e) {
+                throw jsonData+"不能转换为json"
+            }
+        }
+		this.buttonBar.buttonBarJsonData = jsonData;
+	}
+	
+	var topo = new TOPO(".container");
+	$.getJSON("/json/modelJsonData.json",function(data){
+		topo.loadModelJsonData(data)
+	});
+  </script>
 </html>

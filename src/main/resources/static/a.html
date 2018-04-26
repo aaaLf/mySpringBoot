@@ -156,7 +156,7 @@
 					
 					<div style="width: 100%;float: left;height: 30px;">
 						<label style="float: left;">y：</label>
-						<input style="width: 70%;height: 100%;float: left;border-bottom-width: 1px;border-color: #878787;border-style: solid;" v-model.number="scene.selectedElements[0].y">
+						<input style="width: 70%;height: 100%;float: left;border-bottom-width: 1px;border-color: #878787;border-style: solid;" @change="scene.selectedElements[0].y = parseInt($event.target.value)"  :value="scene.selectedElements[0].y">
 					</div>
 				</div>
 			</div>
