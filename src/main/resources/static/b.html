@@ -48,7 +48,7 @@
 		    border-top: solid 1px #CCC;
 		    margin-top: 0px;
     	}
-    	.buttonBar{
+    	.modelBar{
     		position: absolute;
 		    box-sizing: border-box;
 		    top: 0px;
@@ -82,11 +82,9 @@
 		    box-sizing: border-box;
 		    top: 0px;
 		    left: 18%;
-		    bottom:0px;
+		    bottom:20px;
+		    height:100%;
 		    width:82%;
-		    opacity:0.5;
-		    z-index:-1;
-		    overflow: hidden;
     	}
     	
     	.group_title{
@@ -161,28 +159,28 @@
 	<div class="container">
 		<div class="toolbar">
 			<div class="btn-group" role="group" aria-label="...">
-				<button type="button" class="btn btn-default btn-sm active" title="默认">
+				<button type="button" :class="scene.mode === 'edit'?'active':''"  @click="scene.mode = 'edit'" class="btn btn-default btn-sm" title="默认">
 					<i class="fab fa-telegram-plane"></i>
 				</button>
-				<button type="button" class="btn btn-default btn-sm" title="框选">
+				<button type="button" :class="scene.mode === 'select'?'active':''" @click="scene.mode = 'select'" class="btn btn-default btn-sm" title="框选">
 					<i class="fas fa-expand"></i>
 				</button>
-				<button type="button" class="btn btn-default btn-sm"  title="浏览">
+				<button type="button" :class="scene.mode === 'drag'?'active':''" @click="scene.mode = 'drag'" class="btn btn-default btn-sm"  title="浏览">
 					<i class="far fa-square"></i>
 				</button>
 			</div>
 			
 			<div class="btn-group" role="group" aria-label="...">
-				<button type="button" class="btn btn-default btn-sm active" title="居中显示">
+				<button type="button" class="btn btn-default btn-sm" @click="stage.centerAndZoom()" title="居中显示">
 					<i class="fas fa-compress"></i>
 				</button>
-				<button type="button" class="btn btn-default btn-sm" title="全屏显示">
+				<button type="button" class="btn btn-default btn-sm" @click="fullScreen(stage.canvas,'RequestFullScreen')" title="全屏显示">
 					<i class="fas fa-arrows-alt"></i>
 				</button>
-				<button type="button" class="btn btn-default btn-sm" title="放大">
+				<button type="button" class="btn btn-default btn-sm"  @click="stage.zoomOut()" title="放大">
 					<i class="fas fa-search-plus"></i>
 				</button>
-				<button type="button" class="btn btn-default btn-sm" title="缩小">
+				<button type="button" class="btn btn-default btn-sm" @click="stage.zoomIn()" title="缩小">
 					<i class="fas fa-search-minus"></i>
 				</button>
 			</div>
@@ -209,18 +207,24 @@
 			</div>
 		</div>
 		<div class="editor_container">
-			<div class="buttonBar">
-				<template v-for="(group,index) in buttonBarJsonData">
+			<div class="canvas">
+				<canvas id="canvas" @dragover='dragover' @drop="drop"></canvas>
+			</div>
+			
+			<div class="editor"></div>
+			
+			<div class="modelBar">
+				<template v-for="(group,index) in modelJsonData">
 					<div class="group" :class="title_icon_status[index] === 'open'?'':'group_closed'">
-						<div class="group_title" @click="title_icon_click(index)">
+						<div class="group_title" @click="title_click(index)">
 							<span>{{group.groupName}}</span>
 							<span class="title_icon"><i :class="title_icon_status[index] === 'open'?'fa-chevron-down':'fa-chevron-right'" class="fas"></i></span>
 						</div>
 						
 						<div class="row group_models">
 							<template v-for="model in group.models">
-								<div class="col-md-3 model">
-									<img :alt="model.name" :title="model.name" :draggable="draggable" :src="model.img" :m_data="JSON.stringify(model.attributes)">
+								<div class="col-md-3 model" :m_data="JSON.stringify(model)" @dragstart="dragstart" :draggable="draggable">
+									<img :alt="model.name" :title="model.name" draggable="false" :src="model.img">
 								</div>
 							</template>
 						</div>
@@ -228,8 +232,6 @@
 					</div>
 				</template>
 			</div>
-			<div class="canvas"></div>
-			<div class="editor"></div>
 		</div>
 		<div class="footer"></div>
 	</div>
@@ -237,9 +239,12 @@
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
   <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
   <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="/js/jtopo-min.js"></script>
+  <script type="text/javascript" src="/js/toolbar.js"></script>
   <script type="text/javascript"> 
 	
 	function TOPO(element){
+		/**获取对象*/
 		if(typeof element === "string"){
 			this.element = $(element)[0];
 		}else if(element instanceof HTMLElement){
@@ -252,32 +257,151 @@
 		if(this.element == null) throw '参数有误,未获取到绑定对象';
 		var element = this.element;
 		
-		this.toolbar = new Vue({
-			el: '.toolbar',
-			data: {
-			},
-			methods: {
-			}
-		})
-		this.buttonBar = new Vue({
-			el: '.buttonBar',
+		/**模具初始化*/
+		this.modelBar = new Vue({
+			el: element.getElementsByClassName("modelBar")[0],
 			data: {
 				title_icon_status:['open'],
-				buttonBarJsonData:[],
-				draggable:true
+				modelJsonData:[],
+				draggable:true,
+				element:element
 			},
 			methods: {
-				title_icon_click: function(i){
+				/**控制菜单栏关闭，打开*/
+				title_click: function(i){
 					Vue.set(this.title_icon_status,i, this.title_icon_status[i] === 'open'?'close':'open');
+				},
+				/**模具拖拽事件*/
+				dragstart: function(e){
+					e.dataTransfer.setData("data",e.target.getAttribute("m_data"));
 				}
 			}
 		})
-		this.editor;
-		this.canvas;
+		
+		/**绘图框初始化*/
+		this.canvasBox = new Vue({
+			el: element.getElementsByClassName("canvas")[0],
+			data: {
+				stage:null,
+				scene:null
+			},
+			methods: {
+				/**模具进入画布事件*/
+				dragover : function(e){
+					e.preventDefault();
+				},
+				uuid:function () {
+				  var s = [];
+				  var hexDigits = "0123456789abcdef";
+				  for (var i = 0; i < 36; i++) {
+				    s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+				  }
+				  s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+				  s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+				  s[8] = s[13] = s[18] = s[23] = "-";
+				  
+				  var uuid = s.join("");
+				  return uuid;
+				},
+				/**模具拖拽到画布事件*/
+				drop : function(e){
+					e.preventDefault();
+					var jsonString = event.dataTransfer.getData("data");
+					if(jsonString == null){
+						return;
+					}
+					var uuid = this.uuid();
+					var model = JSON.parse(jsonString);
+					var node = new JTopo.Node(model.name);
+					node.setImage(model.img)
+					node.setSize(30,30);
+					node.fontColor = '85,85,85';
+					node.setLocation(e.offsetX-15-this.scene.translateX,e.offsetY-15-this.scene.translateY);
+					node.font = "12px Microsoft YaHei";
+					this.scene.add(node);
+				},
+				/**画布背景网格绘制*/
+				drawGrid: function(context,stepX, stepY, lineWidth, color){  
+			        context.save();  
+			        context.lineWidth = lineWidth;  
+			        context.strokeStyle = color;  
+			        for(var i = stepY + 0.5; i < context.canvas.height; i += stepY){  
+			            context.beginPath();  
+			            context.moveTo(0, i);  
+			            context.lineTo(context.canvas.width, i);  
+			            context.stroke();  
+			        }  
+			        for(var i = stepX + 0.5; i < context.canvas.width; i += stepX){  
+			            context.beginPath();  
+			            context.moveTo(i, 0);  
+			            context.lineTo(i, context.canvas.height);  
+			            context.stroke();  
+			        }  
+			        context.restore();  
+			    } 
+			},
+			/*vue初始化完成，加载绘图工具*/
+			mounted: function(){
+				var canvasDiv = element.getElementsByClassName("canvas")[0];
+				var canvas = element.getElementsByTagName("canvas")[0];
+				canvas.width = canvasDiv.offsetWidth;
+				canvas.height = canvasDiv.offsetHeight;
+				this.stage = new JTopo.Stage(document.getElementById('canvas'));
+				this.scene = new JTopo.Scene(this.stage);
+				this.scene.mode ='edit';
+				
+				var canvasBox =  this;
+				this.scene.paintBackgroud= function(ctx){
+					canvasBox.drawGrid(ctx,40, 40, 1, '#d2d2d2')
+				}
+			}
+		});
+		
+		this.toolBar = new Vue({
+			el: element.getElementsByClassName("toolbar")[0],
+			data: {
+				stage: this.canvasBox.stage,
+				scene: this.canvasBox.scene
+			},
+			methods: {
+				/**全屏显示*/
+				fullScreen: function(element, method) {
+						var usablePrefixMethod;
+						["webkit", "moz", "ms", "o", ""].forEach(function(prefix) {
+						if (usablePrefixMethod) return;
+						if (prefix === "") {
+							// 无前缀，方法首字母小写
+							method = method.slice(0,1).toLowerCase() + method.slice(1);
+						}
+						var typePrefixMethod = typeof element[prefix + method];
+						if (typePrefixMethod + "" !== "undefined") {
+							if (typePrefixMethod === "function") {
+								usablePrefixMethod = element[prefix + method]();
+							} else {
+								usablePrefixMethod = element[prefix + method];
+							}
+						}
+					})
+				}
+			}
+		});
+		
+		/**监听窗口变化，动态修改canvas大小*/
+		var canvasBox = this.canvasBox;
+		window.onresize = function(){
+			var canvasDiv = element.getElementsByClassName("canvas")[0];
+			var canvas = element.getElementsByTagName("canvas")[0];
+			canvas.width = canvasDiv.offsetWidth;
+			canvas.height = canvasDiv.offsetHeight;
+			/**场景大小修改*/
+			canvasBox.stage.width = canvasDiv.offsetWidth;
+			canvasBox.stage.height = canvasDiv.offsetHeight;
+		}
 	}
 	
+	/**加载模具json*/
 	TOPO.prototype.loadModelJsonData = function(jsonData){
-		var json;
+		var json = jsonData;
         if (typeof jsonData === 'string') {
             try {
             	json = JSON.parse(str);
@@ -285,7 +409,7 @@
                 throw jsonData+"不能转换为json"
             }
         }
-		this.buttonBar.buttonBarJsonData = jsonData;
+		this.modelBar.modelJsonData = json;
 	}
 	
 	var topo = new TOPO(".container");
